@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { getPath } from "../util/svg";
 import { FormattedMessage } from "react-intl";
-const countryData: Country[] = require("../data/country_data.json").features;
+const countryData: Country[] = require("../../data/countries.geo.json").features;
 
 type Props = {
   countryName: string;
