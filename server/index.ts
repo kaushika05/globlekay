@@ -43,7 +43,7 @@ interface Room {
   guesses: GuessInfo[];
 }
 
-const countryData: Country[] = require('../src/data/country_data.json').features;
+const countryData: Country[] = require('../data/countries.geo.json').features;
 const validCodes = new Set(countryData.map(c => c.properties.WB_A3));
 
 const rooms: Record<string, Room> = {};

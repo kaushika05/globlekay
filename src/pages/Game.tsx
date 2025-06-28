@@ -13,7 +13,7 @@ import { FormattedMessage } from "react-intl";
 const Globe = lazy(() => import("../components/Globe"));
 const Guesser = lazy(() => import("../components/Guesser"));
 const List = lazy(() => import("../components/List"));
-const countryData: Country[] = require("../data/country_data.json").features;
+const countryData: Country[] = require("../../data/countries.geo.json").features;
 
 type Props = {
   reSpin: boolean;
