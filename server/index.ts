@@ -3,7 +3,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import { Country } from '../src/lib/country';
+import type { Country } from '../src/lib/country';
 import { polygonDistance } from '../src/util/distance';
 import { getColour } from '../src/util/colour';
 import { answerCountry } from '../src/util/answer';
