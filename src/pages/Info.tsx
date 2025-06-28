@@ -119,18 +119,9 @@ export default function Info() {
               GitHub: (
                 <a
                   className="underline"
-                  href="https://github.com/the-abe-train/globle"
+                  href="https://github.com/"
                 >
                   GitHub
-                </a>
-              ),
-              Twitter: (
-                <a
-                  className="underline"
-                  href="https://twitter.com/theAbeTrain"
-                  aria-label="Twitter"
-                >
-                  Twitter
                 </a>
               ),
             }}

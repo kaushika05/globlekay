@@ -97,14 +97,6 @@ export default function Auxilliary({ screen }: Props) {
           </b>
         </Link>
       </div>
-      {(screen === "Help" || screen === "Settings") && (
-        <p className="dark:text-gray-200 my-6">
-          <i>Globle: Capitals</i> is now available.{" "}
-          <a href="https://globle-capitals.com" className="underline">
-            Click here to play!
-          </a>{" "}
-        </p>
-      )}
       {(screen === "Help" || screen === "Info") && (
         <div className="flex-grow flex items-end mb-[100px]">
           <Footer />
