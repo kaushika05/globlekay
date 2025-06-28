@@ -10,7 +10,7 @@ import { FormattedMessage } from "react-intl";
 import { langNameMap } from "../i18n/locales";
 import { AltNames } from "../lib/alternateNames";
 import socket from "../socket";
-const countryData: Country[] = require("../../data/countries.geo.json").features;
+const countryData: Country[] = require("../data/countries.geo.json").features;
 const alternateNames: AltNames = require("../data/alternate_names.json");
 
 type Props = {

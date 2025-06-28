@@ -8,7 +8,7 @@ import Auxilliary from "../components/Auxilliary";
 import { useNavigate } from "react-router-dom";
 import { Country } from "../lib/country";
 import Toggle from "../components/Toggle";
-const countryData: Country[] = require("../../data/countries.geo.json").features;
+const countryData: Country[] = require("../data/countries.geo.json").features;
 
 export default function Settings() {
   const themeContext = useContext(ThemeContext);

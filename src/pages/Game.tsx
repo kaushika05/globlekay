@@ -15,7 +15,7 @@ import RoomModal from "../components/RoomModal";
 const Globe = lazy(() => import("../components/Globe"));
 const Guesser = lazy(() => import("../components/Guesser"));
 const List = lazy(() => import("../components/List"));
-const countryData: Country[] = require("../../data/countries.geo.json").features;
+const countryData: Country[] = require("../data/countries.geo.json").features;
 
 type Props = {
   reSpin: boolean;
