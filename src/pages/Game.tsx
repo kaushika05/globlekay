@@ -1,11 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { GlobeMethods } from "react-globe.gl";
 import { Country } from "../lib/country";
-import { answerCountry } from "../util/answer";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Guesses, Stats } from "../lib/localStorage";
 import { dateDiffInDays, getToday } from "../util/dates";
-import { polygonDistance } from "../util/distance";
 import { getColourEmoji } from "../util/colour";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
@@ -70,13 +68,11 @@ export default function Game({ reSpin, setShowStats }: Props) {
   const [roomCode, setRoomCode] = useState("");
   const [showRoomModal, setShowRoomModal] = useState(!practiceMode);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [playerName, setPlayerName] = useState("");
   const [isCreator, setIsCreator] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardPlayer[]>([]);
   const [serverGuesses, setServerGuesses] = useState<GuessInfo[]>([]);
   const [gameOver, setGameOver] = useState(false);
-  const [gameOverData, setGameOverData] = useState<any>(null);
 
   // Safe JSON parsing utility
   const safeJsonParse = useCallback((jsonString: string | null, fallback: any) => {
@@ -104,7 +100,6 @@ export default function Game({ reSpin, setShowStats }: Props) {
       console.error("Socket not connected");
       return;
     }
-    setPlayerName(playerName);
     setIsCreator(true);
     socket.emit("createRoom", playerName);
   }, [socketConnected]);
@@ -115,7 +110,6 @@ export default function Game({ reSpin, setShowStats }: Props) {
       console.error("Socket not connected");
       return;
     }
-    setPlayerName(playerName);
     setIsCreator(false);
     socket.emit("joinRoom", { code, playerName });
   }, [socketConnected]);
@@ -226,7 +220,6 @@ export default function Game({ reSpin, setShowStats }: Props) {
     }) => {
       console.log("Game over:", data);
       setGameOver(true);
-      setGameOverData(data);
       setWin(true);
       
       // Show final leaderboard

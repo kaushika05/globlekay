@@ -1,9 +1,7 @@
-import { SyntheticEvent, useContext, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { GlobeMethods } from "react-globe.gl";
 import { FormattedMessage } from "react-intl";
-import { LocaleContext } from "../i18n/LocaleContext";
-import { Country, LanguageName } from "../lib/country";
-import { Locale } from "../lib/locale";
+import { Country } from "../lib/country";
 import { answerName } from "../util/answer";
 import { findCentre, turnGlobe } from "../util/globe";
 import Toggle from "./Toggle";
@@ -51,8 +49,6 @@ export default function List({ guesses, win, globeRef, practiceMode, safeJsonPar
     reorderGuesses(guesses, practiceMode, safeJsonParse)
   );
   const [miles, setMiles] = useState(false);
-  const { locale } = useContext(LocaleContext);
-  const langName = "NAME_EN";
 
   useEffect(() => {
     setOrderedGuesses(reorderGuesses(guesses, practiceMode, safeJsonParse));

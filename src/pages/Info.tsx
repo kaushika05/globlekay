@@ -1,8 +1,7 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 import { FormattedMessage } from "react-intl";
 import { Link } from "react-router-dom";
-import { LocaleContext } from "../i18n/LocaleContext";
 
 type ItemProps = {
   q: JSX.Element;
@@ -33,8 +32,6 @@ function Item({ q, a }: ItemProps, idx: number) {
 }
 
 export default function Info() {
-  const localeContext = useContext(LocaleContext);
-
   const faqs = [
     {
       q: <FormattedMessage id="q1" />,
