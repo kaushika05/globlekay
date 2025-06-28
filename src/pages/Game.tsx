@@ -14,6 +14,7 @@ const Globe = lazy(() => import("../components/Globe"));
 const Guesser = lazy(() => import("../components/Guesser"));
 const List = lazy(() => import("../components/List"));
 const countryData: Country[] = require("../data/country_data.json").features;
+import socket from "../socket";
 
 type Props = {
   reSpin: boolean;
@@ -85,6 +86,7 @@ export default function Game({ reSpin, setShowStats }: Props) {
   );
   const [win, setWin] = useState(alreadyWon);
   const globeRef = useRef<GlobeMethods>(null!);
+  const [leaderboard, setLeaderboard] = useState<{ playerId: string; score: number }[]>([]);
 
   // Whenever there's a new guess
   useEffect(() => {
@@ -96,6 +98,17 @@ export default function Game({ reSpin, setShowStats }: Props) {
       });
     }
   }, [guesses, storeGuesses, practiceMode]);
+
+  useEffect(() => {
+    function handleLeaderboard(data: { playerId: string; score: number }[]) {
+      const sorted = [...data].sort((a, b) => b.score - a.score);
+      setLeaderboard(sorted);
+    }
+    socket.on('leaderboardUpdate', handleLeaderboard);
+    return () => {
+      socket.off('leaderboardUpdate', handleLeaderboard);
+    };
+  }, []);
 
   // When the player wins!
   useEffect(() => {
@@ -167,6 +180,13 @@ export default function Game({ reSpin, setShowStats }: Props) {
             globeRef={globeRef}
             practiceMode={practiceMode}
           />
+          {leaderboard.length > 0 && (
+            <ol className="my-4 list-decimal list-inside text-left text-gray-800 dark:text-gray-200">
+              {leaderboard.map((p) => (
+                <li key={p.playerId}>{p.playerId}: {p.score}</li>
+              ))}
+            </ol>
+          )}
           {practiceMode && (
             <div className="my-4 flex flex-wrap gap-3 items-center">
               <span className="dark:text-gray-200">
