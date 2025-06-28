@@ -52,18 +52,7 @@ export default function List({ guesses, win, globeRef, practiceMode, safeJsonPar
   );
   const [miles, setMiles] = useState(false);
   const { locale } = useContext(LocaleContext);
-  const langNameMap: Record<Locale, LanguageName> = {
-    "pt-BR": "NAME_PT",
-    "es-MX": "NAME_ES",
-    "en-CA": "NAME_EN",
-    "fr-FR": "NAME_FR",
-    "de-DE": "NAME_DE",
-    "hu-HU": "NAME_HU",
-    "pl-PL": "NAME_PL",
-    "it-IT": "NAME_IT",
-    "sv-SE": "NAME_SV",
-  };
-  const langName = langNameMap[locale];
+  const langName = "NAME_EN";
 
   useEffect(() => {
     setOrderedGuesses(reorderGuesses(guesses, practiceMode, safeJsonParse));
@@ -119,9 +108,6 @@ export default function List({ guesses, win, globeRef, practiceMode, safeJsonPar
           const { NAME_LEN, ABBREV, NAME, FLAG } = guess.properties;
           const flag = (FLAG || "").toLocaleLowerCase();
           let name = NAME_LEN >= 10 ? ABBREV : NAME;
-          if (locale !== "en-CA") {
-            name = guess.properties[langName];
-          }
 
           return (
             <li key={idx}>

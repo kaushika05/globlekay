@@ -139,11 +139,6 @@ export default function Info() {
     },
   ];
 
-  // Need to skip question 6 if not English or French because it doesn't apply.
-  if (localeContext.locale !== "en-CA" && localeContext.locale !== "fr-FR") {
-    faqs.splice(5, 1);
-  }
-
   return (
     <div className="my-2 space-y-7 dark:text-gray-200">
       <h2
