@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { LocaleContext } from "../i18n/LocaleContext";
-import LanguagePicker from "../components/LanguagePicker";
 import localeList from "../i18n/messages";
 import { FormattedMessage } from "react-intl";
 import Auxilliary from "../components/Auxilliary";
@@ -72,7 +71,6 @@ export default function Settings() {
       className="flex-col items-center align-middle space-y-8 mx-auto my-10 
     min-w-[300px] sm:min-w-[400px] w-fit text-lg max-w-md"
     >
-      <LanguagePicker />
       {options.map((option) => {
         return <Toggle {...option} key={option.name} />;
       })}
