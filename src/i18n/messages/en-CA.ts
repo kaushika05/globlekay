@@ -79,4 +79,9 @@ export const English: Messages = {
   PracticeNew: "New practice game",
   SortByGuesses: "Sort by order of guesses",
   SortByDistance: "Sort by distance",
+  Leaderboard: "Leaderboard",
+  EndGame: "End Game",
+  Guesses: "Guesses",
+  GuessHistory: "Guess History",
+  NoPlayers: "No players in the room",
 };

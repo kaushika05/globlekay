@@ -4,8 +4,8 @@ import Fade from "../transitions/Fade";
 interface Props {
   show: boolean;
   roomCode: string;
-  onCreate: () => void;
-  onJoin: (code: string) => void;
+  onCreate: (playerName: string) => void;
+  onJoin: (code: string, playerName: string) => void;
   onClose: () => void;
   socketConnected: boolean;
 }
@@ -19,10 +19,13 @@ export default function RoomModal({
   socketConnected,
 }: Props) {
   const [code, setCode] = useState("");
+  const [playerName, setPlayerName] = useState("");
 
   function join() {
-    console.log("Join button clicked with code:", code.trim());
-    if (code.trim()) onJoin(code.trim());
+    console.log("Join button clicked with code:", code.trim(), "Name:", playerName.trim());
+    if (code.trim() && playerName.trim()) {
+      onJoin(code.trim(), playerName.trim());
+    }
   }
 
   function copy() {
@@ -31,8 +34,10 @@ export default function RoomModal({
   }
 
   function handleCreate() {
-    console.log("Create button clicked");
-    onCreate();
+    console.log("Create button clicked with name:", playerName.trim());
+    if (playerName.trim()) {
+      onCreate(playerName.trim());
+    }
   }
 
   return (
@@ -71,24 +76,34 @@ export default function RoomModal({
           </div>
         ) : (
           <div className="space-y-4 text-center">
-            <input
-              className="border rounded-md p-2 w-full text-gray-900"
-              placeholder="Room code"
-              value={code}
-              onChange={(e) => setCode(e.currentTarget.value)}
-            />
+            <div className="space-y-2">
+              <input
+                className="border rounded-md p-2 w-full text-gray-900"
+                placeholder="Your name"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.currentTarget.value)}
+                maxLength={20}
+              />
+              <input
+                className="border rounded-md p-2 w-full text-gray-900"
+                placeholder="Room code"
+                value={code}
+                onChange={(e) => setCode(e.currentTarget.value)}
+                maxLength={6}
+              />
+            </div>
             <div className="space-x-2">
               <button
                 className="bg-blue-700 text-white rounded-md px-4 py-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 onClick={join}
-                disabled={!socketConnected}
+                disabled={!socketConnected || !code.trim() || !playerName.trim()}
               >
                 Join
               </button>
               <button
                 className="bg-blue-700 text-white rounded-md px-4 py-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 onClick={handleCreate}
-                disabled={!socketConnected}
+                disabled={!socketConnected || !playerName.trim()}
               >
                 Create
               </button>

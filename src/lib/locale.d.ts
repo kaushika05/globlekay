@@ -10,7 +10,7 @@ export type Locale =
   | "sv-SE";
 
 export type Messages = {
-  name: sting;
+  name: string;
   helpTitle: string;
   help1: string;
   help2: string;
@@ -85,6 +85,11 @@ export type Messages = {
   PracticeNew: string;
   SortByGuesses: string;
   SortByDistance: string;
+  Leaderboard: string;
+  EndGame: string;
+  Guesses: string;
+  GuessHistory: string;
+  NoPlayers: string;
 };
 
 export type LocaleMessages = Record<Locale, Messages>;

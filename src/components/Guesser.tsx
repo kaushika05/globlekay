@@ -21,6 +21,7 @@ type Props = {
   practiceMode: boolean;
   roomCode: string;
   safeJsonParse: (jsonString: string | null, fallback: any) => any;
+  disabled?: boolean;
 };
 
 export default function Guesser({
@@ -31,6 +32,7 @@ export default function Guesser({
   practiceMode,
   roomCode,
   safeJsonParse,
+  disabled = false,
 }: Props) {
   const [guessName, setGuessName] = useState("");
   const [error, setError] = useState("");
@@ -157,7 +159,7 @@ export default function Guesser({
           value={guessName}
           onChange={(e) => setGuessName(e.currentTarget.value)}
           ref={ref}
-          disabled={win}
+          disabled={win || disabled}
           placeholder={guesses.length === 0 ? localeList[locale]["Game1"] : ""}
           autoComplete="new-password"
         />
@@ -166,7 +168,7 @@ export default function Guesser({
           dark:hover:bg-purple-900 disabled:bg-blue-900  text-white 
           font-bold py-1 md:py-2 px-4 rounded focus:shadow-outline "
           type="submit"
-          disabled={win}
+          disabled={win || disabled}
         >
           <FormattedMessage id="Game2" />
         </button>
