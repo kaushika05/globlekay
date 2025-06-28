@@ -1,14 +1,11 @@
 import { useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
-import { getPath } from "../util/svg";
 
 import { FormattedMessage } from "react-intl";
 import { useNavigate } from "react-router-dom";
 
 export default function Footer() {
   const navigate = useNavigate();
-  const iconWidth = 14;
-  const { nightMode } = useContext(ThemeContext).theme;
 
   return (
     <footer className="pt-8 pb-4 text-xs flex items-end justify-between w-full">
