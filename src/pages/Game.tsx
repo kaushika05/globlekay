@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { GlobeMethods } from "react-globe.gl";
 import { Country } from "../lib/country";
-import { answerCountry, answerName } from "../util/answer";
+import { answerCountry } from "../util/answer";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Guesses, Stats } from "../lib/localStorage";
 import { dateDiffInDays, today } from "../util/dates";
@@ -66,25 +66,6 @@ export default function Game({ reSpin, setShowStats }: Props) {
   function joinRoom(code: string) {
     socket.emit("joinRoom", code);
   }
-
-  const storedCountries = useMemo(() => {
-    if (today <= storedGuesses.day && !practiceMode) {
-      const names = storedGuesses.countries;
-      return names.map((guess) => {
-        const foundCountry = countryData.find((country) => {
-          return country.properties.NAME === guess;
-        });
-        if (!foundCountry) throw new Error("Country mapping broken");
-        foundCountry["proximity"] = polygonDistance(
-          foundCountry,
-          answerCountry
-        );
-        return foundCountry;
-      });
-    }
-    return [];
-    // eslint-disable-next-line
-  }, [practiceMode]);
 
   // Game state
   const [guesses, setGuesses] = useState<Country[]>(practiceMode ? [] : []);
