@@ -1,0 +1,4 @@
+{
+  "build": { "env": { "NODE_ENV": "production" }, "command": "npm install && npm run build" },
+  "start": { "command": "npm start", "port": 8080 }
+}
