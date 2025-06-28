@@ -9,6 +9,7 @@ import localeList from "../i18n/messages";
 import { FormattedMessage } from "react-intl";
 import { langNameMap } from "../i18n/locales";
 import { AltNames } from "../lib/alternateNames";
+import socket from "../socket";
 const countryData: Country[] = require("../../data/countries.geo.json").features;
 const alternateNames: AltNames = require("../data/alternate_names.json");
 
@@ -18,6 +19,7 @@ type Props = {
   win: boolean;
   setWin: React.Dispatch<React.SetStateAction<boolean>>;
   practiceMode: boolean;
+  roomCode: string;
 };
 
 export default function Guesser({
@@ -26,6 +28,7 @@ export default function Guesser({
   win,
   setWin,
   practiceMode,
+  roomCode,
 }: Props) {
   const [guessName, setGuessName] = useState("");
   const [error, setError] = useState("");
@@ -90,7 +93,7 @@ export default function Guesser({
         setWin(true);
       }
     } else if (guessCountry.properties.NAME === answerName) {
-      setWin(true);
+      // win state handled by server
     }
     return guessCountry;
   }
@@ -115,7 +118,14 @@ export default function Guesser({
     }
     if (guessCountry && answerCountry) {
       guessCountry["proximity"] = polygonDistance(guessCountry, answerCountry);
-      setGuesses([...guesses, guessCountry]);
+      if (practiceMode) {
+        setGuesses([...guesses, guessCountry]);
+      } else {
+        socket.emit("guess", {
+          roomCode,
+          country: guessCountry.properties.WB_A3,
+        });
+      }
       setGuessName("");
     }
   }
