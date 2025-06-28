@@ -6,10 +6,12 @@
     "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "jsx": "react"
+    "jsx": "react",
+    "moduleResolution": "node"
   },
   "include": [
     "server/**/*.ts",
