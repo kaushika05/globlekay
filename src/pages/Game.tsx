@@ -1,10 +1,10 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { GlobeMethods } from "react-globe.gl";
 import { Country } from "../lib/country";
 import { answerCountry } from "../util/answer";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Guesses, Stats } from "../lib/localStorage";
-import { dateDiffInDays, today } from "../util/dates";
+import { dateDiffInDays, getToday } from "../util/dates";
 import { polygonDistance } from "../util/distance";
 import { getColourEmoji } from "../util/colour";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -25,7 +25,7 @@ type Props = {
 export default function Game({ reSpin, setShowStats }: Props) {
   // Get data from local storage
   const [, storeGuesses] = useLocalStorage<Guesses>("guesses", {
-    day: today,
+    day: getToday(),
     countries: [],
   });
 
@@ -49,6 +49,18 @@ export default function Game({ reSpin, setShowStats }: Props) {
 
   const [roomCode, setRoomCode] = useState("");
   const [showRoomModal, setShowRoomModal] = useState(!practiceMode);
+  const [socketConnected, setSocketConnected] = useState(false);
+
+  // Safe JSON parsing utility
+  const safeJsonParse = useCallback((jsonString: string | null, fallback: any) => {
+    if (!jsonString) return fallback;
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.error("Failed to parse JSON:", error);
+      return fallback;
+    }
+  }, []);
 
   function enterPracticeMode() {
     const practiceAnswer =
@@ -59,77 +71,108 @@ export default function Game({ reSpin, setShowStats }: Props) {
     setWin(false);
   }
 
-  function createRoom() {
+  const createRoom = useCallback(() => {
     console.log("Creating room...");
+    if (!socketConnected) {
+      console.error("Socket not connected");
+      return;
+    }
     socket.emit("createRoom");
-  }
+  }, [socketConnected]);
 
-  function joinRoom(code: string) {
+  const joinRoom = useCallback((code: string) => {
     console.log("Joining room:", code);
+    if (!socketConnected) {
+      console.error("Socket not connected");
+      return;
+    }
     socket.emit("joinRoom", code);
-  }
+  }, [socketConnected]);
 
   // Game state
   const [guesses, setGuesses] = useState<Country[]>(practiceMode ? [] : []);
   const [win, setWin] = useState(false);
   const globeRef = useRef<GlobeMethods>(null!);
 
+  // Socket connection management
   useEffect(() => {
     if (practiceMode) return;
 
-    // Add connection status logging
-    socket.on("connect", () => {
+    console.log("Game: Connecting socket...");
+    socket.connect();
+
+    const handleConnect = () => {
       console.log("Socket connected with ID:", socket.id);
-    });
+      setSocketConnected(true);
+    };
 
-    socket.on("disconnect", () => {
+    const handleDisconnect = () => {
       console.log("Socket disconnected");
-    });
+      setSocketConnected(false);
+    };
 
-    socket.on("connect_error", (error) => {
+    const handleConnectError = (error: any) => {
       console.error("Socket connection error:", error);
-    });
+      setSocketConnected(false);
+    };
 
-    function isoToCountry(iso: string) {
-      const found = countryData.find((c) => c.properties.WB_A3 === iso);
-      if (!found) return null;
-      const copy = { ...found } as Country;
-      copy["proximity"] = polygonDistance(copy, answerCountry);
-      return copy;
-    }
-
-    socket.on("createRoom", (code: string) => {
+    const handleCreateRoom = (code: string) => {
       console.log("Room created with code:", code);
       setRoomCode(code);
       setShowRoomModal(false);
-    });
+    };
 
-    socket.on("roomJoined", (room: any) => {
+    const handleRoomJoined = (room: any) => {
       console.log("Room joined:", room);
       setRoomCode(room.code);
       const list = room.guesses
-        .map((g: any) => isoToCountry(g.country))
+        .map((g: any) => {
+          const found = countryData.find((c) => c.properties.WB_A3 === g.country);
+          if (!found) return null;
+          const copy = { ...found } as Country;
+          copy["proximity"] = polygonDistance(copy, answerCountry);
+          return copy;
+        })
         .filter(Boolean) as Country[];
       setGuesses(list);
-    });
+    };
 
-    socket.on("newGuess", (info: any) => {
-      const c = isoToCountry(info.country);
-      if (c) setGuesses((prev) => [...prev, c]);
-    });
+    const handleNewGuess = (info: any) => {
+      const found = countryData.find((c) => c.properties.WB_A3 === info.country);
+      if (!found) return;
+      const copy = { ...found } as Country;
+      copy["proximity"] = polygonDistance(copy, answerCountry);
+      setGuesses((prev) => [...prev, copy]);
+    };
 
-    socket.on("gameOver", () => {
+    const handleGameOver = () => {
       setWin(true);
-    });
+    };
 
+    // Add event listeners
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleConnectError);
+    socket.on("createRoom", handleCreateRoom);
+    socket.on("roomJoined", handleRoomJoined);
+    socket.on("newGuess", handleNewGuess);
+    socket.on("gameOver", handleGameOver);
+
+    // Cleanup function
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("connect_error");
-      socket.off("createRoom");
-      socket.off("roomJoined");
-      socket.off("newGuess");
-      socket.off("gameOver");
+      console.log("Game: Cleaning up socket listeners");
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleConnectError);
+      socket.off("createRoom", handleCreateRoom);
+      socket.off("roomJoined", handleRoomJoined);
+      socket.off("newGuess", handleNewGuess);
+      socket.off("gameOver", handleGameOver);
+      
+      // Only disconnect if we're not in practice mode
+      if (!practiceMode) {
+        socket.disconnect();
+      }
     };
   }, [practiceMode]);
 
@@ -138,7 +181,7 @@ export default function Game({ reSpin, setShowStats }: Props) {
     if (practiceMode) {
       const guessNames = guesses.map((country) => country.properties.NAME);
       storeGuesses({
-        day: today,
+        day: getToday(),
         countries: guessNames,
       });
     }
@@ -146,6 +189,7 @@ export default function Game({ reSpin, setShowStats }: Props) {
 
   // When the player wins!
   useEffect(() => {
+    const today = getToday();
     if (win && storedStats.lastWin !== today && !practiceMode) {
       // Store new stats in local storage
       const lastWin = today;
@@ -200,6 +244,7 @@ export default function Game({ reSpin, setShowStats }: Props) {
         onCreate={createRoom}
         onJoin={joinRoom}
         onClose={() => setShowRoomModal(false)}
+        socketConnected={socketConnected}
       />
       <Guesser
         guesses={guesses}
@@ -208,6 +253,7 @@ export default function Game({ reSpin, setShowStats }: Props) {
         setWin={setWin}
         practiceMode={practiceMode}
         roomCode={roomCode}
+        safeJsonParse={safeJsonParse}
       />
       {!reSpin && (
         <div className="pb-4 mb-5">
@@ -215,12 +261,14 @@ export default function Game({ reSpin, setShowStats }: Props) {
             guesses={guesses}
             globeRef={globeRef}
             practiceMode={practiceMode}
+            safeJsonParse={safeJsonParse}
           />
           <List
             guesses={guesses}
             win={win}
             globeRef={globeRef}
             practiceMode={practiceMode}
+            safeJsonParse={safeJsonParse}
           />
           {practiceMode && (
             <div className="my-4 flex flex-wrap gap-3 items-center">

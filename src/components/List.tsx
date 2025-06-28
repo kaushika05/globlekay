@@ -13,15 +13,18 @@ type Props = {
   win: boolean;
   globeRef: React.MutableRefObject<GlobeMethods>;
   practiceMode: boolean;
+  safeJsonParse: (jsonString: string | null, fallback: any) => any;
 };
 
-function reorderGuesses(guessList: Country[], practiceMode: boolean) {
+function reorderGuesses(guessList: Country[], practiceMode: boolean, safeJsonParse: (jsonString: string | null, fallback: any) => any) {
   return [...guessList].sort((a, b) => {
     // practice
     if (practiceMode) {
-      const answerCountry = JSON.parse(
-        localStorage.getItem("practice") as string
+      const answerCountry = safeJsonParse(
+        localStorage.getItem("practice"),
+        null
       ) as Country;
+      if (!answerCountry) return a.proximity - b.proximity;
       const answerName = answerCountry.properties.NAME;
       if (a.properties.NAME === answerName) {
         return -1;
@@ -43,9 +46,9 @@ function reorderGuesses(guessList: Country[], practiceMode: boolean) {
   });
 }
 
-export default function List({ guesses, win, globeRef, practiceMode }: Props) {
+export default function List({ guesses, win, globeRef, practiceMode, safeJsonParse }: Props) {
   const [orderedGuesses, setOrderedGuesses] = useState(
-    reorderGuesses(guesses, practiceMode)
+    reorderGuesses(guesses, practiceMode, safeJsonParse)
   );
   const [miles, setMiles] = useState(false);
   const { locale } = useContext(LocaleContext);
@@ -63,8 +66,8 @@ export default function List({ guesses, win, globeRef, practiceMode }: Props) {
   const langName = langNameMap[locale];
 
   useEffect(() => {
-    setOrderedGuesses(reorderGuesses(guesses, practiceMode));
-  }, [guesses, practiceMode]);
+    setOrderedGuesses(reorderGuesses(guesses, practiceMode, safeJsonParse));
+  }, [guesses, practiceMode, safeJsonParse]);
 
   function formatKm(m: number, miles: boolean) {
     const METERS_PER_MILE = 1609.34;

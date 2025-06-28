@@ -20,6 +20,7 @@ type Props = {
   setWin: React.Dispatch<React.SetStateAction<boolean>>;
   practiceMode: boolean;
   roomCode: string;
+  safeJsonParse: (jsonString: string | null, fallback: any) => any;
 };
 
 export default function Guesser({
@@ -29,6 +30,7 @@ export default function Guesser({
   setWin,
   practiceMode,
   roomCode,
+  safeJsonParse,
 }: Props) {
   const [guessName, setGuessName] = useState("");
   const [error, setError] = useState("");
@@ -85,9 +87,14 @@ export default function Guesser({
       return;
     }
     if (practiceMode) {
-      const answerCountry = JSON.parse(
-        localStorage.getItem("practice") as string
+      const answerCountry = safeJsonParse(
+        localStorage.getItem("practice"),
+        null
       ) as Country;
+      if (!answerCountry) {
+        setError("Practice mode error - please refresh the page");
+        return;
+      }
       const answerName = answerCountry.properties.NAME;
       if (guessCountry.properties.NAME === answerName) {
         setWin(true);
@@ -103,9 +110,10 @@ export default function Guesser({
     setError("");
     let guessCountry = runChecks();
     if (practiceMode) {
-      const answerCountry = JSON.parse(
-        localStorage.getItem("practice") as string
-      );
+      const answerCountry = safeJsonParse(
+        localStorage.getItem("practice"),
+        null
+      ) as Country;
       if (guessCountry && answerCountry) {
         guessCountry["proximity"] = polygonDistance(
           guessCountry,
@@ -168,6 +176,7 @@ export default function Guesser({
         error={error}
         guesses={guesses.length}
         practiceMode={practiceMode}
+        safeJsonParse={safeJsonParse}
       />
     </div>
   );

@@ -10,7 +10,7 @@ import { ThemeContext } from "./context/ThemeContext";
 import Fade from "./transitions/Fade";
 import { MobileOnlyView, TabletView, BrowserView } from "react-device-detect";
 import SnackAdUnit from "./components/SnackAdUnit";
-import socket from "./socket";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   // State
@@ -27,65 +27,49 @@ function App() {
     if (reSpin) setTimeout(() => setReSpin(false), 1);
   }, [reSpin]);
 
-  useEffect(() => {
-    console.log("App: Connecting socket...");
-    socket.connect();
-    
-    socket.on("connect", () => {
-      console.log("App: Socket connected with ID:", socket.id);
-    });
-    
-    socket.on("connect_error", (error) => {
-      console.error("App: Socket connection error:", error);
-    });
-    
-    return () => {
-      socket.off("connect");
-      socket.off("connect_error");
-    };
-  }, []);
-
   const dark = themeContext.theme.nightMode ? "dark" : "";
 
   return (
-    <div
-      className={`max-w-xs sm:max-w-md md:max-w-2xl mx-auto 
-      z-20 absolute top-0 bottom-0 left-0 right-0 block ${dark}`}
-    >
-      <Header setReSpin={setReSpin} setShowStats={setShowStats} />
-
-      <Fade
-        show={showStats}
-        background="border-4 border-sky-300 dark:border-slate-700 bg-sky-100 
-        dark:bg-slate-900 drop-shadow-xl 
-      absolute z-10 w-full sm:w-fit inset-x-0 mx-auto py-6 px-6 rounded-md 
-      space-y-2"
+    <ErrorBoundary>
+      <div
+        className={`max-w-xs sm:max-w-md md:max-w-2xl mx-auto 
+        z-20 absolute top-0 bottom-0 left-0 right-0 block ${dark}`}
       >
-        <Statistics setShowStats={setShowStats} />
-      </Fade>
-      <Routes>
-        <Route path="/" element={<Help />} />
-        <Route
-          path="/game"
-          element={<Game reSpin={reSpin} setShowStats={setShowStats} />}
-        />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/info" element={<Info />} />
-      </Routes>
-      {!practiceMode && (
-        <div className="sm:py-4">
-          <MobileOnlyView>
-            <SnackAdUnit unitName="snack_mex1" siteId="2902" />
-          </MobileOnlyView>
-          <BrowserView>
-            <SnackAdUnit unitName="snack_dex1" siteId="2902" />
-          </BrowserView>
-          <TabletView>
-            <SnackAdUnit unitName="snack_dex1" siteId="2902" />
-          </TabletView>
-        </div>
-      )}
-    </div>
+        <Header setReSpin={setReSpin} setShowStats={setShowStats} />
+
+        <Fade
+          show={showStats}
+          background="border-4 border-sky-300 dark:border-slate-700 bg-sky-100 
+          dark:bg-slate-900 drop-shadow-xl 
+        absolute z-10 w-full sm:w-fit inset-x-0 mx-auto py-6 px-6 rounded-md 
+        space-y-2"
+        >
+          <Statistics setShowStats={setShowStats} />
+        </Fade>
+        <Routes>
+          <Route path="/" element={<Help />} />
+          <Route
+            path="/game"
+            element={<Game reSpin={reSpin} setShowStats={setShowStats} />}
+          />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/info" element={<Info />} />
+        </Routes>
+        {!practiceMode && (
+          <div className="sm:py-4">
+            <MobileOnlyView>
+              <SnackAdUnit unitName="snack_mex1" siteId="2902" />
+            </MobileOnlyView>
+            <BrowserView>
+              <SnackAdUnit unitName="snack_dex1" siteId="2902" />
+            </BrowserView>
+            <TabletView>
+              <SnackAdUnit unitName="snack_dex1" siteId="2902" />
+            </TabletView>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { today } from "../util/dates";
+import { getToday } from "../util/dates";
 
 interface IStorage extends Object {
   day?: string;
@@ -25,6 +25,7 @@ export function useLocalStorage<T extends IStorage>(
   });
 
   useEffect(() => {
+    const today = getToday();
     const ex = value?.day ? value.day : "9999-99-99";
     if (today <= ex) {
       localStorage.setItem(key, JSON.stringify(value));

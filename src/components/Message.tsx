@@ -12,9 +12,10 @@ type Props = {
   error: any;
   guesses: number;
   practiceMode: boolean;
+  safeJsonParse: (jsonString: string | null, fallback: any) => any;
 };
 
-export function Message({ win, error, guesses, practiceMode }: Props) {
+export function Message({ win, error, guesses, practiceMode, safeJsonParse }: Props) {
   const { locale } = useContext(LocaleContext);
 
   let name = answerName;
@@ -23,13 +24,16 @@ export function Message({ win, error, guesses, practiceMode }: Props) {
     name = answerCountry["properties"][langName];
   }
   if (practiceMode) {
-    const answerCountry = JSON.parse(
-      localStorage.getItem("practice") as string
+    const answerCountry = safeJsonParse(
+      localStorage.getItem("practice"),
+      null
     ) as Country;
-    name = answerCountry.properties.NAME;
-    if (locale !== "en-CA") {
-      const langName = langNameMap[locale];
-      name = answerCountry["properties"][langName];
+    if (answerCountry) {
+      name = answerCountry.properties.NAME;
+      if (locale !== "en-CA") {
+        const langName = langNameMap[locale];
+        name = answerCountry["properties"][langName];
+      }
     }
   }
 

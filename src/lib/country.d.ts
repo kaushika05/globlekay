@@ -6,20 +6,11 @@ export type Country = {
     featurecla: string;
     LABELRANK: number;
     SOVEREIGNT: string;
-    SOV_A3: string; // function pickCountry(name: string) {
-    //   const country = countries.find(c => {
-    //     return c.properties.NAME === name;
-    //   })
-    //   return country;
-    // }
-    ADM0_DIF: //     return c.properties.NAME === name;
-    //   })
-    //   return country;
-    // }
-    number;
+    SOV_A3: string;
+    ADM0_DIF: number;
     LEVEL: number;
     TYPE: string;
-    ADMIN: string; //     return c.properties.NAME === name;
+    ADMIN: string;
     ADM0_A3: string;
     GEOU_DIF: number;
     GEOUNIT: string;
@@ -34,7 +25,7 @@ export type Country = {
     BRK_NAME: string;
     BRK_GROUP: null;
     ABBREV: string;
-    POSTAL: string; // For both, West and South are negative
+    POSTAL: string;
     FORMAL_EN: string | null;
     FORMAL_FR: string | null;
     NAME_CIAWF: string | null;
@@ -150,3 +141,5 @@ type LanguageName =
   | "NAME_VI"
   | "NAME_ZH"
   | "NAME_ZHT";
+
+export { LanguageName };

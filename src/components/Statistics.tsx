@@ -3,7 +3,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 import { Stats } from "../lib/localStorage";
 import { isMobile } from "react-device-detect";
 import { getPath } from "../util/svg";
-import { today } from "../util/dates";
+import { getToday } from "../util/dates";
 import { isFirefox } from "react-device-detect";
 import { FormattedMessage } from "react-intl";
 import { LocaleContext } from "../i18n/LocaleContext";
@@ -41,6 +41,7 @@ export default function Statistics({ setShowStats }: Props) {
     emojiGuesses,
   } = storedStats;
 
+  const today = getToday();
   const sumGuesses = usedGuesses.reduce((a, b) => a + b, 0);
   const avgGuesses = Math.round((sumGuesses / usedGuesses.length) * 100) / 100;
   const showAvgGuesses = usedGuesses.length === 0 ? "--" : avgGuesses;

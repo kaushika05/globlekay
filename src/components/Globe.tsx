@@ -12,11 +12,12 @@ type Props = {
   guesses: Country[];
   globeRef: React.MutableRefObject<GlobeMethods>;
   practiceMode: boolean;
+  safeJsonParse: (jsonString: string | null, fallback: any) => any;
 };
 
 const ZOOM_SPEED = 1;
 
-export default function Globe({ guesses, globeRef, practiceMode }: Props) {
+export default function Globe({ guesses, globeRef, practiceMode, safeJsonParse }: Props) {
   // State
   const [places, setPlaces] = useState(guesses);
 
@@ -77,9 +78,11 @@ export default function Globe({ guesses, globeRef, practiceMode }: Props) {
   // Polygon colour
   function polygonColour(country: Country) {
     if (practiceMode) {
-      const answerCountry = JSON.parse(
-        localStorage.getItem("practice") as string
-      );
+      const answerCountry = safeJsonParse(
+        localStorage.getItem("practice"),
+        null
+      ) as Country;
+      if (!answerCountry) return "#BBBBBB";
       return getColour(
         country,
         answerCountry,

@@ -8,4 +8,7 @@ export function dateDiffInDays(day1: string, day2: string) {
   return diff;
 }
 
-export const today = new Date().toLocaleDateString("en-CA");
+export const getToday = () => new Date().toLocaleDateString("en-CA");
+
+/** @deprecated Use getToday() instead for dynamic date */
+export const today = getToday();
