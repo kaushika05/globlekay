@@ -10,6 +10,7 @@ import { ThemeContext } from "./context/ThemeContext";
 import Fade from "./transitions/Fade";
 import { MobileOnlyView, TabletView, BrowserView } from "react-device-detect";
 import SnackAdUnit from "./components/SnackAdUnit";
+import socket from "./socket";
 
 function App() {
   // State
@@ -25,6 +26,10 @@ function App() {
   useEffect(() => {
     if (reSpin) setTimeout(() => setReSpin(false), 1);
   }, [reSpin]);
+
+  useEffect(() => {
+    socket.connect();
+  }, []);
 
   const dark = themeContext.theme.nightMode ? "dark" : "";
 

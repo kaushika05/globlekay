@@ -9,6 +9,8 @@ import { polygonDistance } from "../util/distance";
 import { getColourEmoji } from "../util/colour";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
+import socket from "../socket";
+import RoomModal from "../components/RoomModal";
 
 const Globe = lazy(() => import("../components/Globe"));
 const Guesser = lazy(() => import("../components/Guesser"));
@@ -45,6 +47,9 @@ export default function Game({ reSpin, setShowStats }: Props) {
   const navigate = useNavigate();
   const practiceMode = !!params.get("practice_mode");
 
+  const [roomCode, setRoomCode] = useState("");
+  const [showRoomModal, setShowRoomModal] = useState(!practiceMode);
+
   function enterPracticeMode() {
     const practiceAnswer =
       countryData[Math.floor(Math.random() * countryData.length)];
@@ -52,6 +57,14 @@ export default function Game({ reSpin, setShowStats }: Props) {
     navigate("/game?practice_mode=true");
     setGuesses([]);
     setWin(false);
+  }
+
+  function createRoom() {
+    socket.emit("createRoom");
+  }
+
+  function joinRoom(code: string) {
+    socket.emit("joinRoom", code);
   }
 
   const storedCountries = useMemo(() => {
@@ -73,22 +86,54 @@ export default function Game({ reSpin, setShowStats }: Props) {
     // eslint-disable-next-line
   }, [practiceMode]);
 
-  // Check if win condition already met
-  const alreadyWon = practiceMode
-    ? false
-    : storedCountries?.map((c) => c.properties.NAME).includes(answerName);
-
-  // Now we're ready to start the game! Set up the game states with the data we
-  // already know from the stored info.
-  const [guesses, setGuesses] = useState<Country[]>(
-    practiceMode ? [] : storedCountries
-  );
-  const [win, setWin] = useState(alreadyWon);
+  // Game state
+  const [guesses, setGuesses] = useState<Country[]>(practiceMode ? [] : []);
+  const [win, setWin] = useState(false);
   const globeRef = useRef<GlobeMethods>(null!);
+
+  useEffect(() => {
+    if (practiceMode) return;
+
+    function isoToCountry(iso: string) {
+      const found = countryData.find((c) => c.properties.WB_A3 === iso);
+      if (!found) return null;
+      const copy = { ...found } as Country;
+      copy["proximity"] = polygonDistance(copy, answerCountry);
+      return copy;
+    }
+
+    socket.on("createRoom", (code: string) => {
+      setRoomCode(code);
+    });
+
+    socket.on("roomJoined", (room: any) => {
+      setRoomCode(room.code);
+      const list = room.guesses
+        .map((g: any) => isoToCountry(g.country))
+        .filter(Boolean) as Country[];
+      setGuesses(list);
+    });
+
+    socket.on("newGuess", (info: any) => {
+      const c = isoToCountry(info.country);
+      if (c) setGuesses((prev) => [...prev, c]);
+    });
+
+    socket.on("gameOver", () => {
+      setWin(true);
+    });
+
+    return () => {
+      socket.off("createRoom");
+      socket.off("roomJoined");
+      socket.off("newGuess");
+      socket.off("gameOver");
+    };
+  }, [practiceMode]);
 
   // Whenever there's a new guess
   useEffect(() => {
-    if (!practiceMode) {
+    if (practiceMode) {
       const guessNames = guesses.map((country) => country.properties.NAME);
       storeGuesses({
         day: today,
@@ -147,12 +192,20 @@ export default function Game({ reSpin, setShowStats }: Props) {
 
   return (
     <Suspense fallback={renderLoader()}>
+      <RoomModal
+        show={!practiceMode && showRoomModal}
+        roomCode={roomCode}
+        onCreate={createRoom}
+        onJoin={joinRoom}
+        onClose={() => setShowRoomModal(false)}
+      />
       <Guesser
         guesses={guesses}
         setGuesses={setGuesses}
         win={win}
         setWin={setWin}
         practiceMode={practiceMode}
+        roomCode={roomCode}
       />
       {!reSpin && (
         <div className="pb-4 mb-5">
