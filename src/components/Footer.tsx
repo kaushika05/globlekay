@@ -1,6 +1,3 @@
-import { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
-
 import { FormattedMessage } from "react-intl";
 import { useNavigate } from "react-router-dom";
 

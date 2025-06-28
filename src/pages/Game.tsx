@@ -24,7 +24,7 @@ type Props = {
 
 export default function Game({ reSpin, setShowStats }: Props) {
   // Get data from local storage
-  const [storedGuesses, storeGuesses] = useLocalStorage<Guesses>("guesses", {
+  const [, storeGuesses] = useLocalStorage<Guesses>("guesses", {
     day: today,
     countries: [],
   });
