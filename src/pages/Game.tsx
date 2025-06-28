@@ -60,10 +60,12 @@ export default function Game({ reSpin, setShowStats }: Props) {
   }
 
   function createRoom() {
+    console.log("Creating room...");
     socket.emit("createRoom");
   }
 
   function joinRoom(code: string) {
+    console.log("Joining room:", code);
     socket.emit("joinRoom", code);
   }
 
@@ -75,6 +77,19 @@ export default function Game({ reSpin, setShowStats }: Props) {
   useEffect(() => {
     if (practiceMode) return;
 
+    // Add connection status logging
+    socket.on("connect", () => {
+      console.log("Socket connected with ID:", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
     function isoToCountry(iso: string) {
       const found = countryData.find((c) => c.properties.WB_A3 === iso);
       if (!found) return null;
@@ -84,10 +99,13 @@ export default function Game({ reSpin, setShowStats }: Props) {
     }
 
     socket.on("createRoom", (code: string) => {
+      console.log("Room created with code:", code);
       setRoomCode(code);
+      setShowRoomModal(false);
     });
 
     socket.on("roomJoined", (room: any) => {
+      console.log("Room joined:", room);
       setRoomCode(room.code);
       const list = room.guesses
         .map((g: any) => isoToCountry(g.country))
@@ -105,6 +123,9 @@ export default function Game({ reSpin, setShowStats }: Props) {
     });
 
     return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("connect_error");
       socket.off("createRoom");
       socket.off("roomJoined");
       socket.off("newGuess");

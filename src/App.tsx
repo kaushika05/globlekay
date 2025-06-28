@@ -28,7 +28,21 @@ function App() {
   }, [reSpin]);
 
   useEffect(() => {
+    console.log("App: Connecting socket...");
     socket.connect();
+    
+    socket.on("connect", () => {
+      console.log("App: Socket connected with ID:", socket.id);
+    });
+    
+    socket.on("connect_error", (error) => {
+      console.error("App: Socket connection error:", error);
+    });
+    
+    return () => {
+      socket.off("connect");
+      socket.off("connect_error");
+    };
   }, []);
 
   const dark = themeContext.theme.nightMode ? "dark" : "";

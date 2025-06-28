@@ -79,14 +79,19 @@ function addGuess(room: Room, playerId: string, iso: string): GuessInfo | null {
 }
 
 io.on('connection', socket => {
+  console.log('Client connected:', socket.id);
+  
   socket.on('createRoom', () => {
+    console.log('Creating room for client:', socket.id);
     const code = generateCode();
     joinRoom(code, socket.id);
     socket.join(code);
+    console.log('Room created with code:', code);
     socket.emit('createRoom', code);
   });
 
   socket.on('joinRoom', (code: string) => {
+    console.log('Client joining room:', code, 'Client ID:', socket.id);
     const room = joinRoom(code, socket.id);
     socket.join(code);
     socket.emit('roomJoined', room);
@@ -103,6 +108,10 @@ io.on('connection', socket => {
     if (country === answerCountry.properties.WB_A3) {
       io.to(roomCode).emit('gameOver', leaderboard);
     }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
   });
 });
 
