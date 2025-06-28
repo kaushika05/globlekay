@@ -30,7 +30,7 @@
     "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
     "start:client": "react-scripts start",
     "start:server": "ts-node-dev --respawn --compiler-options '{\"module\":\"CommonJS\"}' server/index.ts",
-    "build": "react-scripts build",
+    "build": "tsc -p tsconfig.server.json && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "ts": "tsc -w",
