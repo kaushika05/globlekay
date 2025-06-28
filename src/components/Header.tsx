@@ -48,7 +48,7 @@ export default function Header({ setReSpin, setShowStats }: Props) {
             className="text-4xl font-extrabold"
             style={{ fontFamily: "'Montserrat'" }}
           >
-            GLOBLE
+            Kay's Globle Mod
           </h1>
         </button>
         <div className="space-x-1 flex absolute right-0 bottom-1">

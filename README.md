@@ -1,4 +1,4 @@
-# Notes about Globle
+# Notes about Kay's Globle Mod
 
 **Version 1.6.0** - [Change log](CHANGELOG.md)
 
@@ -6,7 +6,7 @@
 - The list of countries for this game is the same as that used by [Sporcle](https://www.sporcle.com/blog/2013/01/what-is-a-country/)
 - Some alternate spellings and previous names are accepted, e.g. Burma for Myanmar.
 - France and UK have many territories scattered throughout the globe, and they confuse the proximity algorithm, so they are not highlighted when those countries are guessed.
-- Geography can be a sensitive topic, and some countries' borders are disputed. If you believe a correction should be made, please politely raise an issue or DM me on [Twitter](https://twitter.com/theAbeTrain).
+- Geography can be a sensitive topic, and some countries' borders are disputed. If you believe a correction should be made, please politely raise an issue or raise an issue on GitHub.
 
 ## Tip
 If you are really struggling to find the answer, I recommend going to Google Maps or Earth. Better to learn about a new country than never get the answer!
