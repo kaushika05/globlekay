@@ -10,6 +10,11 @@ import { getColour } from '../src/util/colour';
 const app = express();
 app.use(cors());
 
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
