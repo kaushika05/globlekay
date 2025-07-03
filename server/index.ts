@@ -58,7 +58,8 @@ interface Room {
   createdAt: number;
 }
 
-const countryData: Country[] = require('../data/countries.geo.json').features;
+import countryDataJson from '../data/countries.geo.json' assert { type: 'json' };
+const countryData: Country[] = countryDataJson.features;
 const validCodes = new Set(countryData.map(c => c.properties.WB_A3));
 
 const rooms: Record<string, Room> = {};

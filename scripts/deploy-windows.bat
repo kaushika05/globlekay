@@ -40,7 +40,10 @@ call npm run build:server
 REM Deploy to Railway
 echo 🚀 Deploying to Railway...
 call railway up
-
+if %errorlevel% neq 0 (
+    echo ❌ Railway deployment failed
+    exit /b 1
+)
 echo ✅ Backend deployed to Railway
 
 REM Deploy Frontend to Vercel
@@ -59,8 +62,11 @@ call npm run build:client
 
 REM Deploy to Vercel
 echo 🚀 Deploying to Vercel...
-call vercel --prod
-
+call vercel --prod --cwd . --yes --name globlekayfrontend
+if %errorlevel% neq 0 (
+    echo ❌ Vercel deployment failed
+    exit /b 1
+)
 echo ✅ Frontend deployed to Vercel
 
 echo.
@@ -70,6 +76,7 @@ echo 📋 Next steps:
 echo 1. Go to your Vercel project settings
 echo 2. Add environment variable: REACT_APP_SOCKET_URL = your-railway-backend-url
 echo 3. Redeploy your Vercel project to apply the environment variable
+echo 4. Ensure your backend server listens on the port provided by the PORT environment variable and exposes a /health endpoint for Railway health checks
 echo.
 echo 🔧 To redeploy in the future, run: scripts\deploy-windows.bat
 
